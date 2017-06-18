@@ -1,0 +1,11 @@
+{
+  "name": "node-meridian-rs232",
+  "version": "1.0.0",
+  "description": "RS232 control for Meridian Audio deviecs",
+  "main": "lib.js",
+  "author": "Roon Labs, LLC",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "serialport": "^4.0.1"
+  }
+}
