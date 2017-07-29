@@ -37,7 +37,7 @@ let _processw = function() {
                     });
 }
 
-function tn51(val, cb) {
+function send(val, cb) {
     this._qw.push(val);
     _processw.call(this);
 };
@@ -46,7 +46,7 @@ Meridian.prototype.volume_up = function() {
     if (this.devicetype == "TN51" ||
         this.devicetype == "TN49")
     {
-        _tn51.call(this, "VP\r");
+        send.call(this, "VP\r");
     } else {
         throw new Error("device type " + this.devicetype + " do not support volume_up");
     }
@@ -55,7 +55,7 @@ Meridian.prototype.volume_down = function(val) {
     if (this.devicetype == "TN51" ||
         this.devicetype == "TN49")
     {
-        _tn51.call(this, "VM\r");
+        send.call(this, "VM\r");
     } else {
         throw new Error("device type " + this.devicetype + " do not support volume_down");
     }
@@ -67,7 +67,7 @@ Meridian.prototype.set_volume = function(val) {
 	if (this.properties.volume == val) return;
 	if (this.volumetimer) clearTimeout(this.volumetimer);
         this.volumetimer = setTimeout(() => {
-            _tn51.call(this, "VN" + ("00" + Number(val).toString()).slice(-2) + "\r");
+            send.call(this, "VN" + ("00" + Number(val).toString()).slice(-2) + "\r");
 	}, 50)
     } else {
         throw new Error("device type " + this.devicetype + " do not support set_volume");
@@ -77,7 +77,7 @@ Meridian.prototype.standby = function(val) {
     if (this.devicetype == "TN51" ||
         this.devicetype == "TN49")
     {
-        _tn51.call(this, "SB\r");
+        send.call(this, "SB\r");
     } else {
         throw new Error("device type " + this.devicetype + " do not support standby");
     }
@@ -86,7 +86,7 @@ Meridian.prototype.set_source = function(val) {
     if (this.devicetype == "TN51" ||
         this.devicetype == "TN49")
     {
-        _tn51.call(this, val.slice(0,2) + "\r");
+        send.call(this, val.slice(0,2) + "\r");
     } else {
         throw new Error("device type " + this.devicetype + " do not support set_source");
     }
@@ -95,7 +95,7 @@ Meridian.prototype.mute = function() {
     if (this.devicetype == "TN51" ||
         this.devicetype == "TN49")
     {
-        _tn51.call(this, "MU\r");
+        send.call(this, "MU\r");
     } else {
         throw new Error("device type " + this.devicetype + " do not support mute"); }
 };
@@ -176,7 +176,6 @@ Meridian.prototype.init = function(opts, closecb) {
                         this.properties.volume = vol;
                         this.emit('volume', vol);
                     }
-                    return;
                 } else {
                     if (second == "Standby") {
                         let val = "Standby";
@@ -205,6 +204,15 @@ Meridian.prototype.init = function(opts, closecb) {
             }
         });
 
+    } else if (this.devicetype == "218") {
+//        this._port = new SerialPort(opts.port, {
+//            baudRate: opts.baud || 9600,
+//            parser:   SerialPort.parsers.readline("\r")
+//        });
+
+//        "#MSR SB\n"
+//            "#MSR VP\n"
+
     } else {
         throw new Error("unsupported device type " + devicetype + " -- Someone forgot to write some code here.");
     }
@@ -219,8 +227,8 @@ Meridian.prototype.init = function(opts, closecb) {
         this.emit('preconnected');
 
         if (this.devicetype == "TN51" || this.devicetype == "TN49") {
-            _tn51.call(this, this.properties.source + "\r");
-            _tn51.call(this, "VN" + ("00" + Number(this.properties.volume).toString()).slice(-2) + "\r");
+            send.call(this, this.properties.source + "\r");
+            send.call(this, "VN" + ("00" + Number(this.properties.volume).toString()).slice(-2) + "\r");
         }
     });
 
