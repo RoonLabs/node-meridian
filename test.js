@@ -1,6 +1,6 @@
-var MeridianRS232 = require(".");
+var Meridian = require(".");
 
-var d = new MeridianRS232("TN51");
+var d = new Meridian("TN51");
 
 d.on('volume', (vol) => {
     console.log("*** Got volume", vol);

@@ -4,17 +4,17 @@ let SerialPort = require("serialport"),
     util       = require("util"),
     events     = require('events');
 
-function MeridianRS232(devicetype) {
+function Meridian(devicetype) {
     if (devicetype == "TN51") {
         // Meridian Technical Note TN51.2
     } else {
-        throw new Error("unsupported device type " + devicetype + " -- Unfortunately, there are many protocols for Meridian RS232 control.");
+        throw new Error("unsupported device type " + devicetype + " -- Unfortunately, there are many protocols for Meridian control.");
     }
     this.devicetype = devicetype;
     this.seq = 0;
 }
 
-util.inherits(MeridianRS232, events.EventEmitter);
+util.inherits(Meridian, events.EventEmitter);
 
 let _processw = function() {
     if (!this._port) return;
@@ -22,7 +22,7 @@ let _processw = function() {
     if (this._qw.length == 0) return;
 
     this._woutstanding = true;
-    console.log("[Meridian RS232] writing to RS232:", this._qw[0]);
+    console.log("[Meridian] writing:", this._qw[0]);
 
     this._port.write(this._qw[0] + "\r",
                     (err) => {
@@ -38,21 +38,21 @@ let _tn51 = function(val, cb) {
     _processw.call(this);
 };
 
-MeridianRS232.prototype.volume_up = function() {
+Meridian.prototype.volume_up = function() {
     if (this.devicetype == "TN51") {
         _tn51.call(this, "VP");
     } else {
         throw new Error("device type " + this.devicetype + " do not support volume_up");
     }
 };
-MeridianRS232.prototype.volume_down = function(val) {
+Meridian.prototype.volume_down = function(val) {
     if (this.devicetype == "TN51") {
         _tn51.call(this, "VM");
     } else {
         throw new Error("device type " + this.devicetype + " do not support volume_down");
     }
 };
-MeridianRS232.prototype.set_volume = function(val) {
+Meridian.prototype.set_volume = function(val) {
     if (this.devicetype == "TN51") {
 	if (this.properties.volume == val) return;
 	if (this.volumetimer) clearTimeout(this.volumetimer);
@@ -63,28 +63,28 @@ MeridianRS232.prototype.set_volume = function(val) {
         throw new Error("device type " + this.devicetype + " do not support set_volume");
     }
 };
-MeridianRS232.prototype.standby = function(val) {
+Meridian.prototype.standby = function(val) {
     if (this.devicetype == "TN51") {
         _tn51.call(this, "SB");
     } else {
         throw new Error("device type " + this.devicetype + " do not support standby");
     }
 };
-MeridianRS232.prototype.set_source = function(val) {
+Meridian.prototype.set_source = function(val) {
     if (this.devicetype == "TN51") {
         _tn51.call(this, val.slice(0,2));
     } else {
         throw new Error("device type " + this.devicetype + " do not support set_source");
     }
 };
-MeridianRS232.prototype.mute = function() {
+Meridian.prototype.mute = function() {
     if (this.devicetype == "TN51") {
         _tn51.call(this, "MU");
     } else {
         throw new Error("device type " + this.devicetype + " do not support mute"); }
 };
 
-MeridianRS232.prototype.init = function(port, opts, closecb) {
+Meridian.prototype.init = function(port, opts, closecb) {
     let self = this;
 
     this._qw = [];
@@ -102,7 +102,7 @@ MeridianRS232.prototype.init = function(port, opts, closecb) {
 
         this._port.on('data', data => {
 	    data = data.trim();
-	    console.log('[Meridian RS232] received from RS232:', data);
+	    console.log('[Meridian] received:', data);
 
 	    if (/^V\. *([0-9][0-9]*) *$/.test(data)) {
 	       let val = Number(data.trim().replace(/^V\. *([0-9][0-9]*) *$/, "$1"));
@@ -184,7 +184,7 @@ MeridianRS232.prototype.init = function(port, opts, closecb) {
 	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
 
 	    } else {
-	        console.log("[Meridian RS232] Unknown data received:", data);
+	        console.log("[Meridian] Unknown data received:", data);
 	    }
 
 	    if (this.initializing) {
@@ -216,7 +216,7 @@ MeridianRS232.prototype.init = function(port, opts, closecb) {
     this._port.on('disconnect', ()  => { this._port.close(() => { this._port = undefined; if (closecb) { var cb2 = closecb; closecb = undefined; cb2('disconnect'); } }) });
 };
 
-MeridianRS232.prototype.start = function(port, opts) {
+Meridian.prototype.start = function(port, opts) {
     this.seq++;
 
     let closecb = (why) => {
@@ -239,11 +239,11 @@ MeridianRS232.prototype.start = function(port, opts) {
     }
 };
 
-MeridianRS232.prototype.stop = function() {
+Meridian.prototype.stop = function() {
     this.seq++;
     if (this._port)
         this._port.close(() => {});
 };
 
-exports = module.exports = MeridianRS232;
+exports = module.exports = Meridian;
 

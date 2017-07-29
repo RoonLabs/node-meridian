@@ -1,10 +1,10 @@
-# RS232 Control for Meridian Audio Devices
+# Control for Meridian Audio Devices
 
 Initialization:
 
 ```javascript
-var MeridianRS232 = require("node-meridain-rs232");
-var d = new MeridianRS232("TN51");
+var Meridian = require("node-meridian");
+var d = new Meridian("TN51");
 ```
 
 Listening to events:
