@@ -85,7 +85,7 @@ Meridian.prototype.mute = function() {
         throw new Error("device type " + this.devicetype + " do not support mute"); }
 };
 
-Meridian.prototype.init = function(port, opts, closecb) {
+Meridian.prototype.init = function(opts, closecb) {
     let self = this;
 
     this._qw = [];
@@ -96,7 +96,7 @@ Meridian.prototype.init = function(port, opts, closecb) {
     this.initializing = true;
 
     if (this.devicetype == "TN51") {
-        this._port = new SerialPort(port, {
+        this._port = new SerialPort(opts.port, {
             baudRate: opts.baud || 9600,
             parser:   SerialPort.parsers.readline("\r")
         });
@@ -226,17 +226,17 @@ Meridian.prototype.start = function(opts) {
             var seq = ++this.seq;
             setTimeout(() => {
                 if (seq != this.seq) return;
-                this.start(opts.port, opts);
+                this.start(opts);
             }, 1000);
         }
     };
 
     if (this._port) {
         this._port.close(() => {
-            this.init(opts.port, opts, closecb);
+            this.init(opts, closecb);
         });
     } else {
-        this.init(opts.port, opts, closecb);
+        this.init(opts, closecb);
     }
 };
 
