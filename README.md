@@ -38,14 +38,33 @@ Note that Meridian treats Mute and Standby as a "source".
 Starting/Stopping the connection to the Meridian device:
 
 ```javascript
-d.start(port, opts);
+d.start(opts);
 ```
 
-* `port` should be like `'/dev/cu.usbserial'` or something similar on MacOS or Linux, or `'COM3'` on Windows
-* `opts` should be {}
-
-
+and
 
 ```javascript
 d.stop();
 ```
+
+
+For serial based devices, `opts` should be something like:
+```json
+{
+  "port": "/dev/cu.usbserial"
+}
+```
+
+On Windows, you should use a port like "COM3".
+
+
+For IP based devices like the [218](https://www.meridian-audio.com/en/products/streaming/218/), `opts` should be like this:
+```json
+{
+    "ip": "192.168.1.7"
+}
+```
+
+
+
+
