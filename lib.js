@@ -153,50 +153,34 @@ Meridian.prototype.init = function(opts, closecb) {
         });
 
         this._port.on('data', data => {
-	    data = data.trim();
 	    console.log('[Meridian] received:', data);
 
-            let cmd = data.split(/  */);
+            if (data.length != 20) return;
 
-            let first;
-            let second;
-            if (cmd.length >= 2) {
-                second = cmd[cmd.length-1];
-                first = data.substring(0, data.length-second.length).trim();
+            if (/Diag\./.test(data)) return;
+            if (/^FIFO /.test(data)) return;
+            if (/^DSP  /.test(data)) return;
 
-            } else {
-                second = undefined;
-                first = data;
+            if (/^\. *$/.test(data)) {
+                let val = "Standby";
+                if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
+                return;
             }
 
-            if (second !== undefined) {
-                let vol = Number(second);
-                if (!Number.isNaN(vol)) {
-                    if (this.properties.volume != vol) {
-                        this.properties.volume = vol;
-                        this.emit('volume', vol);
-                    }
-                } else {
-                    if (second == "Standby") {
-                        let val = "Standby";
-                        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
-                        return;
-                    }
-                }
+            if (/^Mute *$/.test(data) || /^Muted *$/.test(data)) {
+                let val = "Muted";
+                if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
+                return;
             }
 
-	    if (/^Standby$/.test(first) || /^\.$/.test(first)) {
-	        let val = "Standby";
-	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
+            let source = data.substring(0,5);
+            if (this.properties.source != source) { this.properties.source = source; this.emit('source', source); }
 
-	    } else if (/^Mute/.test(first)) { // Mute or Muted
-	        let val = "Muted";
-	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
-
-	    } else {
-	        let val = first;
-	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
-	    }
+            if (/ [ 0-9][0-9]$/.test(data)) {
+                let vol = Number(data.substring(18));
+                if (!Number.isNaN(vol))
+                    if (this.properties.volume != vol) { this.properties.volume = vol; this.emit('volume', vol); }
+            }
 
 	    if (this.initializing) {
 		this.initializing = false;
