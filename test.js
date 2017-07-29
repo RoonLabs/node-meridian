@@ -38,4 +38,4 @@ function ev_cmd(line) {
     else console.log("!!! Unknown command " + line);
 }
 
-d.start("/dev/tty.usbserial", {});
+d.start({ "port" : "/dev/tty.usbserial" });
