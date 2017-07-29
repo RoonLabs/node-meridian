@@ -119,6 +119,11 @@ Meridian.prototype.init = function(opts, closecb) {
         });
 
         this._port.on('data', data => {
+	    if (this.initializing) {
+		this.initializing = false;
+		this.emit('connected');
+            }
+
 	    data = data.trim();
 	    console.log('[Meridian] received:', data);
 
@@ -141,11 +146,6 @@ Meridian.prototype.init = function(opts, closecb) {
 	        let val = data;
 	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
 	    }
-
-	    if (this.initializing) {
-		this.initializing = false;
-		this.emit('connected');
-            }
         });
 
     } else if (this.devicetype == "TN49") {
@@ -155,6 +155,11 @@ Meridian.prototype.init = function(opts, closecb) {
         });
 
         this._port.on('data', data => {
+	    if (this.initializing) {
+		this.initializing = false;
+		this.emit('connected');
+            }
+
 	    console.log('[Meridian] received:', data);
 
             if (data.length != 20) return;
@@ -173,9 +178,11 @@ Meridian.prototype.init = function(opts, closecb) {
 
             if (/^Mute *$/.test(data) || /^Muted *$/.test(data)) {
                 let val = "Muted";
-                if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
+                if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); } 
                 return;
             }
+
+            if (data[5] != ' ') return;
 
             let source = data.substring(0,5);
             if (this.properties.source != source) { this.properties.source = source; this.emit('source', source); }
@@ -184,11 +191,6 @@ Meridian.prototype.init = function(opts, closecb) {
                 let vol = Number(data.substring(18));
                 if (!Number.isNaN(vol))
                     if (this.properties.volume != vol) { this.properties.volume = vol; this.emit('volume', vol); }
-            }
-
-	    if (this.initializing) {
-		this.initializing = false;
-		this.emit('connected');
             }
         });
 
