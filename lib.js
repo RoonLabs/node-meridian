@@ -7,6 +7,8 @@ let SerialPort = require("serialport"),
 function Meridian(devicetype) {
     if (devicetype == "TN51") {
         // Meridian Technical Note TN51.2
+    } else if (devicetype == "218") {
+        // Meridian 218 Zone Controller
     } else {
         throw new Error("unsupported device type " + devicetype + " -- Unfortunately, there are many protocols for Meridian control.");
     }
@@ -42,8 +44,7 @@ Meridian.prototype.volume_up = function() {
     if (this.devicetype == "TN51") {
         _tn51.call(this, "VP");
     } else {
-        throw new Error("device type " + this.devicetype + " do not support volume_up");
-    }
+        throw new Error("device type " + this.devicetype + " do not support volume_up"); }
 };
 Meridian.prototype.volume_down = function(val) {
     if (this.devicetype == "TN51") {
@@ -216,7 +217,7 @@ Meridian.prototype.init = function(port, opts, closecb) {
     this._port.on('disconnect', ()  => { this._port.close(() => { this._port = undefined; if (closecb) { var cb2 = closecb; closecb = undefined; cb2('disconnect'); } }) });
 };
 
-Meridian.prototype.start = function(port, opts) {
+Meridian.prototype.start = function(opts) {
     this.seq++;
 
     let closecb = (why) => {
@@ -225,17 +226,17 @@ Meridian.prototype.start = function(port, opts) {
             var seq = ++this.seq;
             setTimeout(() => {
                 if (seq != this.seq) return;
-                this.start(port, opts);
+                this.start(opts.port, opts);
             }, 1000);
         }
     };
 
     if (this._port) {
         this._port.close(() => {
-            this.init(port, opts, closecb);
+            this.init(opts.port, opts, closecb);
         });
     } else {
-        this.init(port, opts, closecb);
+        this.init(opts.port, opts, closecb);
     }
 };
 
