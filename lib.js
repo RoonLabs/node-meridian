@@ -47,6 +47,8 @@ Meridian.prototype.volume_up = function() {
         this.devicetype == "TN49")
     {
         send.call(this, "VP\r");
+    } else if (this.devicetype == "218") {
+        send.call(this, "#MSR VP\r");
     } else {
         throw new Error("device type " + this.devicetype + " do not support volume_up");
     }
@@ -160,8 +162,10 @@ Meridian.prototype.init = function(opts, closecb) {
             if (/Diag\./.test(data)) return;
             if (/^FIFO /.test(data)) return;
             if (/^DSP  /.test(data)) return;
+            if (/^Error /.test(data)) return;
+            if (/^ *$/.test(data)) return;
 
-            if (/^\. *$/.test(data)) {
+            if (/^ *\. *$/.test(data)) {
                 let val = "Standby";
                 if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
                 return;
