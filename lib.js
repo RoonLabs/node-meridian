@@ -143,7 +143,7 @@ Meridian.prototype.init = function(opts, closecb) {
 	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
 
 	    } else {
-	        let val = data;
+	        let val = data.trim();
 	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
 	    }
         });
@@ -184,7 +184,7 @@ Meridian.prototype.init = function(opts, closecb) {
 
             if (data[5] != ' ') return;
 
-            let source = data.substring(0,5);
+            let source = data.substring(0,5).trim();
             if (this.properties.source != source) { this.properties.source = source; this.emit('source', source); }
 
             if (/ [ 0-9][0-9]$/.test(data)) {
