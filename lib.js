@@ -44,7 +44,8 @@ function send(val, cb) {
 
 Meridian.prototype.volume_up = function() {
     if (this.devicetype == "TN51" ||
-        this.devicetype == "TN49")
+        this.devicetype == "TN49" ||
+        this.devicetype == "DS 6ii03")
     {
         send.call(this, "VP\r");
     } else if (this.devicetype == "218") {
@@ -55,7 +56,8 @@ Meridian.prototype.volume_up = function() {
 };
 Meridian.prototype.volume_down = function(val) {
     if (this.devicetype == "TN51" ||
-        this.devicetype == "TN49")
+        this.devicetype == "TN49" ||
+        this.devicetype == "DS 6ii03")
     {
         send.call(this, "VM\r");
     } else {
@@ -64,7 +66,8 @@ Meridian.prototype.volume_down = function(val) {
 };
 Meridian.prototype.set_volume = function(val) {
     if (this.devicetype == "TN51" ||
-        this.devicetype == "TN49")
+        this.devicetype == "TN49" ||
+        this.devicetype == "DS 6ii03")
     {
 	if (this.properties.volume == val) return;
 	if (this.volumetimer) clearTimeout(this.volumetimer);
@@ -77,7 +80,8 @@ Meridian.prototype.set_volume = function(val) {
 };
 Meridian.prototype.standby = function(val) {
     if (this.devicetype == "TN51" ||
-        this.devicetype == "TN49")
+        this.devicetype == "TN49" ||
+        this.devicetype == "DS 6ii03")
     {
         send.call(this, "SB\r");
     } else {
@@ -86,7 +90,8 @@ Meridian.prototype.standby = function(val) {
 };
 Meridian.prototype.set_source = function(val) {
     if (this.devicetype == "TN51" ||
-        this.devicetype == "TN49")
+        this.devicetype == "TN49" ||
+        this.devicetype == "DS 6ii03")
     {
         send.call(this, val.slice(0,2) + "\r");
     } else {
@@ -95,7 +100,8 @@ Meridian.prototype.set_source = function(val) {
 };
 Meridian.prototype.mute = function() {
     if (this.devicetype == "TN51" ||
-        this.devicetype == "TN49")
+        this.devicetype == "TN49" ||
+        this.devicetype == "DS 6ii03")
     {
         send.call(this, "MU\r");
     } else {
@@ -192,6 +198,41 @@ Meridian.prototype.init = function(opts, closecb) {
                 if (!Number.isNaN(vol))
                     if (this.properties.volume != vol) { this.properties.volume = vol; this.emit('volume', vol); }
             }
+        });
+
+    } else if (this.devicetype == "DS 6ii03") {
+        this._port = new SerialPort(opts.port, {
+            baudRate: opts.baud || 9600,
+            parser:   SerialPort.parsers.readline("\r")
+        });
+
+        this._port.on('data', data => {
+	    if (this.initializing) {
+		this.initializing = false;
+		this.emit('connected');
+            }
+
+	    data = data.trim();
+	    console.log('[Meridian] received:', data);
+
+	    if (/^..... +([0-9][0-9]?) *$/.test(data)) {
+	       let vol = Number(data.trim().replace(/^..... +([0-9][0-9]?) *$/, "$1"));
+	       let src = data.trim().replace(/^(.....) +[0-9][0-9]? *$/, "$1").trim();
+	       if (this.properties.volume != vol) { this.properties.volume = vol; this.emit('volume', vol); }
+               if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
+
+	    } else if (/^Standby$/i.test(data) || /^\.$/.test(data)) {
+	        let src = "Standby";
+	        if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
+
+	    } else if (/^Mute/i.test(data)) { // Mute or Muted
+	        let src = "Muted";
+	        if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
+
+	    } else {
+	        let src = data.trim();
+	        if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
+	    }
         });
 
     } else if (this.devicetype == "218") {
