@@ -66,5 +66,25 @@ For IP based devices like the [218](https://www.meridian-audio.com/en/products/s
 ```
 
 
+--------------
+Meridian's protocol is slightly different on each device, so you have to pass in the name of the protocol. These are what each of the protocols map to:
 
+**TN51**
+- DSP520
+- DSP640
+- M6
+- DSW
+- DSP3200
+- DSP3300
+- DSP5200
+- DSP7200
+- DSP8000
 
+**TN49**
+- 808
+- 818
+
+**DS 6ii03**
+- DSP 5000
+- DSP 420
+- DSP 33
