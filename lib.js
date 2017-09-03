@@ -11,6 +11,8 @@ function Meridian(devicetype) {
         // Meridian Technical Note TN49
     } else if (devicetype == "218") {
         // Meridian 218 Zone Controller
+    } else if (devicetype == "DS 6ii03") {
+        // Meridian DSP5000 and DSP420
     } else {
         throw new Error("unsupported device type " + devicetype + " -- Unfortunately, there are many protocols for Meridian control.");
     }
