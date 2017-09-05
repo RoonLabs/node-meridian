@@ -230,10 +230,6 @@ Meridian.prototype.init = function(opts, closecb) {
 	    } else if (/^Mute/i.test(data)) { // Mute or Muted
 	        let src = "Muted";
 	        if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
-
-	    } else {
-	        let src = data.trim();
-	        if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
 	    }
         });
 
