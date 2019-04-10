@@ -4,6 +4,8 @@ let SerialPort = require("serialport"),
     util       = require("util"),
     events     = require('events');
 
+let Readline =  require('@serialport/parser-readline');
+
 function Meridian(devicetype) {
     if (devicetype == "TN51") {
         // Meridian Technical Note TN51.2
@@ -123,7 +125,7 @@ Meridian.prototype.init = function(opts, closecb) {
     if (this.devicetype == "TN51") {
         this._port = new SerialPort(opts.port, {
             baudRate: opts.baud || 9600,
-            parser:   SerialPort.parsers.readline("\r")
+            parser:   new Readline({ delimiter: '\r' })
         });
 
         this._port.on('data', data => {
@@ -159,7 +161,7 @@ Meridian.prototype.init = function(opts, closecb) {
     } else if (this.devicetype == "TN49") {
         this._port = new SerialPort(opts.port, {
             baudRate: opts.baud || 9600,
-            parser:   SerialPort.parsers.readline("\r")
+            parser:   new Readline({ delimiter: '\r' })
         });
 
         this._port.on('data', data => {
@@ -205,7 +207,7 @@ Meridian.prototype.init = function(opts, closecb) {
     } else if (this.devicetype == "DS 6ii03") {
         this._port = new SerialPort(opts.port, {
             baudRate: opts.baud || 9600,
-            parser:   SerialPort.parsers.readline("\r")
+            parser:   new Readline({ delimiter: '\r' })
         });
 
         this._port.on('data', data => {
@@ -236,7 +238,7 @@ Meridian.prototype.init = function(opts, closecb) {
     } else if (this.devicetype == "218") {
 //        this._port = new SerialPort(opts.port, {
 //            baudRate: opts.baud || 9600,
-//            parser:   SerialPort.parsers.readline("\r")
+//            parser:   new SerialPort.parsers.Readline({ delimiter: '\r' })
 //        });
 
 //        "#MSR SB\n"
