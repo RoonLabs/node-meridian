@@ -6,6 +6,6 @@
   "author": "Roon Labs, LLC",
   "license": "Apache-2.0",
   "dependencies": {
-    "serialport": "^4.0.1"
+    "serialport": "^7.1.4"
   }
 }

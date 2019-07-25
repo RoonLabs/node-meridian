@@ -4,6 +4,8 @@ let SerialPort = require("serialport"),
     util       = require("util"),
     events     = require('events');
 
+let Readline =  require('@serialport/parser-readline');
+
 function Meridian(devicetype) {
     if (devicetype == "TN51") {
         // Meridian Technical Note TN51.2
@@ -123,17 +125,17 @@ Meridian.prototype.init = function(opts, closecb) {
     if (this.devicetype == "TN51") {
         this._port = new SerialPort(opts.port, {
             baudRate: opts.baud || 9600,
-            parser:   SerialPort.parsers.readline("\r")
-        });
+        })
+        let parser = this._port.pipe(new Readline({ delimiter: '\r' }));
 
-        this._port.on('data', data => {
+        parser.on('data', data => {
 	    if (this.initializing) {
 		this.initializing = false;
 		this.emit('connected');
             }
 
-	    data = data.trim();
 	    console.log('[Meridian] received:', data);
+	    if (data) data = data.trim();
 
 	    if (/^V\. *([0-9][0-9]*) *$/.test(data)) {
 	       let val = Number(data.trim().replace(/^V\. *([0-9][0-9]*) *$/, "$1"));
@@ -158,11 +160,11 @@ Meridian.prototype.init = function(opts, closecb) {
 
     } else if (this.devicetype == "TN49") {
         this._port = new SerialPort(opts.port, {
-            baudRate: opts.baud || 9600,
-            parser:   SerialPort.parsers.readline("\r")
+            baudRate: opts.baud || 9600
         });
+        let parser = this._port.pipe(new Readline({ delimiter: '\r' }));
 
-        this._port.on('data', data => {
+        parser.on('data', data => {
 	    if (this.initializing) {
 		this.initializing = false;
 		this.emit('connected');
@@ -204,11 +206,11 @@ Meridian.prototype.init = function(opts, closecb) {
 
     } else if (this.devicetype == "DS 6ii03") {
         this._port = new SerialPort(opts.port, {
-            baudRate: opts.baud || 9600,
-            parser:   SerialPort.parsers.readline("\r")
+            baudRate: opts.baud || 9600
         });
+        let parser = this._port.pipe(new Readline({ delimiter: '\r' }));
 
-        this._port.on('data', data => {
+        parser.on('data', data => {
 	    if (this.initializing) {
 		this.initializing = false;
 		this.emit('connected');
@@ -234,11 +236,6 @@ Meridian.prototype.init = function(opts, closecb) {
         });
 
     } else if (this.devicetype == "218") {
-//        this._port = new SerialPort(opts.port, {
-//            baudRate: opts.baud || 9600,
-//            parser:   SerialPort.parsers.readline("\r")
-//        });
-
 //        "#MSR SB\n"
 //            "#MSR VP\n"
 
