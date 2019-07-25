@@ -124,8 +124,8 @@ Meridian.prototype.init = function(opts, closecb) {
 
     if (this.devicetype == "TN51") {
         this._port = new SerialPort(opts.port, {
-            baudRate: opts.baud || 9600,
-        })
+            baudRate: opts.baud || 9600
+        });
         let parser = this._port.pipe(new Readline({ delimiter: '\r' }));
 
         parser.on('data', data => {
