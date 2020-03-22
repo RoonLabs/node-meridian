@@ -138,7 +138,7 @@ Meridian.prototype.init = function(opts, closecb) {
 	    if (data) data = data.trim();
 
 	    if (/^V\. *([0-9][0-9]*) *$/.test(data)) {
-	       let val = Number(data.trim().replace(/^V\. *([0-9][0-9]*) *$/, "$1"));
+	       let val = Number(data.replace(/^V\. *([0-9][0-9]*) *$/, "$1"));
 	       if (this.properties.volume != val) {
 		   this.properties.volume = val;
 	           this.emit('volume', val);
@@ -153,7 +153,7 @@ Meridian.prototype.init = function(opts, closecb) {
 	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
 
 	    } else {
-	        let val = data.trim();
+	        let val = data;
 	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
 	    }
         });
@@ -216,12 +216,12 @@ Meridian.prototype.init = function(opts, closecb) {
 		this.emit('connected');
             }
 
-	    data = data.trim();
+            if (data) data = data.trim();
 	    console.log('[Meridian] received:', data);
 
 	    if (/^..... +([0-9][0-9]?) *$/.test(data)) {
-	       let vol = Number(data.trim().replace(/^..... +([0-9][0-9]?) *$/, "$1"));
-	       let src = data.trim().replace(/^(.....) +[0-9][0-9]? *$/, "$1").trim();
+	       let vol = Number(data.replace(/^..... +([0-9][0-9]?) *$/, "$1"));
+	       let src = data.replace(/^(.....) +[0-9][0-9]? *$/, "$1").trim();
 	       if (this.properties.volume != vol) { this.properties.volume = vol; this.emit('volume', vol); }
                if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
 
