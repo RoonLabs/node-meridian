@@ -137,24 +137,35 @@ Meridian.prototype.init = function(opts, closecb) {
 	    console.log('[Meridian] received:', data);
 	    if (data) data = data.trim();
 
-	    if (/^V[\.oN].*([0-9][0-9]*)$/.test(data)) {
-	       let val = Number(data.replace(/^.*([0-9][0-9]*)$/, "$1"));
+	    let m;
+	    if ((m = data.match(/^(V\.|VN|Volume) *([0-9]+)$/))) {
+	       let val = Number(m[2]);
 	       if (this.properties.volume != val) {
 		   this.properties.volume = val;
 	           this.emit('volume', val);
 	       }
 
 	    } else if (/^Standby$/.test(data) || /^\.$/.test(data)) {
-	        let val = "Standby";
-	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
+	        let src = "Standby";
+	        if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
 
 	    } else if (/^Mute/.test(data)) { // Mute or Muted
-	        let val = "Muted";
-	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
+	        let src = "Muted";
+	        if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
+
+	    } else if ((m = data.match(/^([A-Za-z]+) *([0-9]+)$/))) {
+	       let src = m[1];
+	       let vol = Number(m[2]);
+	       if (this.properties.volume != vol) { this.properties.volume = vol; this.emit('volume', vol); }
+               if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
+
+	    } else if ((m = data.match(/^.* ([0-9]+)$/))) {
+	       let vol = Number(m[1]);
+	       if (this.properties.volume != vol) { this.properties.volume = vol; this.emit('volume', vol); }
 
 	    } else {
-	        let val = data;
-	        if (this.properties.source != val) { this.properties.source = val; this.emit('source', val); }
+	        let src = data;
+	        if (this.properties.source != src) { this.properties.source = src; this.emit('source', src); }
 	    }
         });
 
