@@ -137,8 +137,8 @@ Meridian.prototype.init = function(opts, closecb) {
 	    console.log('[Meridian] received:', data);
 	    if (data) data = data.trim();
 
-	    if (/^V[\.N] *([0-9][0-9]*)$/.test(data)) {
-	       let val = Number(data.replace(/^V[\.N] *([0-9][0-9]*)$/, "$1"));
+	    if (/^V[\.oN].*([0-9][0-9]*)$/.test(data)) {
+	       let val = Number(data.replace(/^.*([0-9][0-9]*)$/, "$1"));
 	       if (this.properties.volume != val) {
 		   this.properties.volume = val;
 	           this.emit('volume', val);
